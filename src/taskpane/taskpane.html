@@ -12,11 +12,55 @@
     <!-- Office JavaScript API -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
 
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
     <!-- Template styles -->
     <link href="taskpane.css" rel="stylesheet" type="text/css" />
   </head>
 
-  <body class="">
-    <button id="run">Run</button>
+  <body class="container">
+    <div class="mb-3">
+      <select name="queryList" id="queryList" class="form-select">
+        <option value="">Select a query</option>
+      </select>
+    </div>
+
+    <form>
+      <div class="mb-3">
+        <label for="queryName" class="form-label">Query Name:</label>
+        <input type="text" id="queryName" class="form-control" placeholder="Get Customers" />
+        <div id="queryNameHelp" class="form-text">
+          ^ Query should be unique when saved. Existing query will be overwritten if named the same. This will also be
+          the worksheet and table name.
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="url" class="form-label">Your GraphQL API URL:</label>
+        <input type="text" id="url" class="form-control" placeholder="https://fwt.fast-weigh.dev/v1/graphql" />
+      </div>
+      <div class="mb-3">
+        <label for="apiKey" class="form-label">Your API Key:</label>
+        <input type="text" id="apiKey" class="form-control" placeholder="your-api-key-goes-here" />
+      </div>
+      <div class="mb-3">
+        <label for="query" class="form-label">GraphQL Query:</label>
+        <textarea id="query" rows="5" class="form-control" placeholder="query { Customer { CustomerID }}"></textarea>
+      </div>
+    </form>
+    <button id="save" class="btn btn-primary">Save 💾</button>
+    <button id="del" class="btn btn-danger">Delete 🗑️</button>
+    <button id="run" class="btn btn-success">Run ▶️</button>
+
+    <!-- Bootstrap JS Bundle -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

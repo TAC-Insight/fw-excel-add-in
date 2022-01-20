@@ -6,45 +6,26 @@
 
 import getRangeString from "./getRangeString";
 import { flatten } from "flat";
-
+import { createOrUpdateQuery, getQuery, listQueries, deleteQuery } from "./db";
 /* global console, document, Excel, Office */
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Excel) {
+    // register handlers here
     document.getElementById("run").onclick = run;
+    document.getElementById("save").onclick = save;
+    document.getElementById("del").onclick = del;
+    document.getElementById("queryList").onchange = loadSelectedQuery;
+    loadQueryList();
   }
 });
 
 export async function run() {
   try {
-    const url = "https://fwt.fast-weigh.dev/v1/graphql";
-    const apiKey = "bb9274ff-15d0-446a-b897-5a23b9f34f22";
-    const sheetName = "GetCustomers";
-    const tableName = "GetCustomers";
-    const query = `
-      query GetTickets {
-        LoadTicket(limit: 1000, order_by: {TicketKey: desc}) {
-          TicketNumber
-          TicketDate
-          TicketDateTime
-          GrossWeight
-          TareWeight
-          NetWeight
-          Order {
-            OrderNumber
-            Salesperson {
-              Name
-            }
-          }
-          Truck {
-            TruckID
-            Hauler {
-              HaulerID
-            }
-          }
-        }
-      }
-    `;
+    const url = document.getElementById("url").value;
+    const apiKey = document.getElementById("apiKey").value;
+    const queryName = document.getElementById("queryName").value;
+    const query = document.getElementById("query").value;
 
     let response = await fetch(url, {
       method: "POST",
@@ -85,11 +66,11 @@ export async function run() {
     // Fire up the Excel engine
     await Excel.run(async (context) => {
       // get sheet
-      let sheet = context.workbook.worksheets.getItemOrNullObject(sheetName);
+      let sheet = context.workbook.worksheets.getItemOrNullObject(queryName);
       await context.sync();
       // eslint-disable-next-line office-addins/load-object-before-read
       if (sheet.isNullObject) {
-        sheet = context.workbook.worksheets.add(sheetName);
+        sheet = context.workbook.worksheets.add(queryName);
       }
 
       // clear sheet
@@ -129,7 +110,7 @@ export async function run() {
 
       // convert to table
       const table = sheet.tables.add(rangeString, true);
-      table.name = tableName;
+      table.name = queryName;
 
       // activate sheet and sync
       sheet.activate();
@@ -141,4 +122,52 @@ export async function run() {
     console.error("Error message: " + error.message);
     console.error("Error debugInfo: " + error.debugInfo);
   }
+}
+
+export async function save() {
+  const queryName = document.getElementById("queryName").value;
+  const url = document.getElementById("url").value;
+  const apiKey = document.getElementById("apiKey").value;
+  const query = document.getElementById("query").value;
+  createOrUpdateQuery(queryName, url, apiKey, query);
+  loadQueryList();
+}
+
+export async function del() {
+  const queryName = document.getElementById("queryList").value;
+  deleteQuery(queryName);
+  document.getElementById("queryName").value = "";
+  document.getElementById("url").value = "";
+  document.getElementById("apiKey").value = "";
+  document.getElementById("query").value = "";
+
+  loadQueryList();
+}
+
+export async function loadQueryList() {
+  const queryList = document.getElementById("queryList");
+  queryList.innerHTML = "";
+  let defaultOption = document.createElement("option");
+  defaultOption.value = "Select a query";
+  defaultOption.innerHTML = "Select a query";
+  queryList.appendChild(defaultOption);
+  const queries = listQueries();
+  queries.forEach((queryName) => {
+    let option = document.createElement("option");
+    option.value = queryName;
+    option.innerText = queryName;
+    queryList.appendChild(option);
+  });
+}
+
+export async function loadSelectedQuery() {
+  const queryName = document.getElementById("queryList").value;
+  if (queryName === "Select a query") {
+    return;
+  }
+  const query = getQuery(queryName);
+  document.getElementById("queryName").value = queryName;
+  document.getElementById("url").value = query.url;
+  document.getElementById("apiKey").value = query.apiKey;
+  document.getElementById("query").value = query.query;
 }
