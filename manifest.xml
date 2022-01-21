@@ -11,7 +11,7 @@
   <Description DefaultValue="Fast-Weigh + Excel = :)"/>
   <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png"/>
-  <SupportUrl DefaultValue="https://www.contoso.com/help"/>
+  <SupportUrl DefaultValue="https://www.tacinsight.com/support"/>
   <AppDomains>
     <AppDomain>https://www.tacinsight.com</AppDomain>
   </AppDomains>
