@@ -3,9 +3,9 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
   xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="TaskPaneApp">
-  <Id>05c2e1c9-3e1d-406e-9a91-e9ac64854143</Id>
-  <Version>1.0.0.0</Version>
-  <ProviderName>Fast-Weigh</ProviderName>
+  <Id>7adb27e7-7979-47e9-83b9-3530626bf197</Id>
+  <Version>1.0.0.1</Version>
+  <ProviderName>TAC Insight</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Fast-Weigh Add-in"/>
   <Description DefaultValue="Fast-Weigh + Excel = :)"/>

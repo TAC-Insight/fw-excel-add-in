@@ -4,9 +4,9 @@
  * See LICENSE in the project root for license information.
  */
 
-import getRangeString from "./getRangeString";
 import { flatten } from "flat";
 import { createOrUpdateQuery, getQuery, listQueries, deleteQuery } from "./db";
+import setAlertMsg from "./setAlertMsg";
 /* global console, document, Excel, Office */
 
 Office.onReady((info) => {
@@ -15,6 +15,7 @@ Office.onReady((info) => {
     document.getElementById("run").onclick = run;
     document.getElementById("save").onclick = save;
     document.getElementById("del").onclick = del;
+    document.getElementById("clearAlertMsg").onclick = clearAlertMsg;
     document.getElementById("queryList").onchange = loadSelectedQuery;
     loadQueryList();
   }
@@ -22,6 +23,9 @@ Office.onReady((info) => {
 
 export async function run() {
   try {
+    // set alert msg
+    setAlertMsg(`Running query...`);
+
     const url = document.getElementById("url").value;
     const apiKey = document.getElementById("apiKey").value;
     const queryName = document.getElementById("queryName").value;
@@ -98,25 +102,26 @@ export async function run() {
 
       console.log("rangeBody");
       console.log(rangeBody);
-      const rangeString = getRangeString(headers.length, rangeBody.length);
-      let range = sheet.getRange(rangeString);
+      let range = sheet.getCell(0, 0).getResizedRange(rangeBody.length - 1, rangeBody[0].length - 1);
       range.values = rangeBody;
+      range.load("address");
+      await context.sync();
 
       // autofit cells
       if (Office.context.requirements.isSetSupported("ExcelApi", "1.2")) {
-        sheet.getUsedRange().format.autofitColumns();
-        sheet.getUsedRange().format.autofitRows();
+        sheet.getRange(range.address).format.autofitColumns();
+        sheet.getRange(range.address).format.autofitRows();
       }
 
-      // convert to table
-      const table = sheet.tables.add(rangeString, true);
-      table.name = queryName;
+      // set alert msg
+      setAlertMsg(`Worksheet "${queryName}" created.`);
 
       // activate sheet and sync
       sheet.activate();
-      return context.sync();
+      await context.sync();
     });
   } catch (error) {
+    setAlertMsg(`Error: ${error.message}`);
     console.error(error);
     console.error("Error code: " + error.code);
     console.error("Error message: " + error.message);
@@ -125,23 +130,42 @@ export async function run() {
 }
 
 export async function save() {
-  const queryName = document.getElementById("queryName").value;
-  const url = document.getElementById("url").value;
-  const apiKey = document.getElementById("apiKey").value;
-  const query = document.getElementById("query").value;
-  createOrUpdateQuery(queryName, url, apiKey, query);
-  loadQueryList();
+  try {
+    setAlertMsg(`Saving query...`);
+    const queryName = document.getElementById("queryName").value;
+    const url = document.getElementById("url").value;
+    const apiKey = document.getElementById("apiKey").value;
+    const query = document.getElementById("query").value;
+    createOrUpdateQuery(queryName, url, apiKey, query);
+    setAlertMsg("Query saved to your list");
+    loadQueryList();
+  } catch (error) {
+    setAlertMsg(`Error: ${error.message}`);
+    console.error(error);
+    console.error("Error code: " + error.code);
+    console.error("Error message: " + error.message);
+    console.error("Error debugInfo: " + error.debugInfo);
+  }
 }
 
 export async function del() {
-  const queryName = document.getElementById("queryList").value;
-  deleteQuery(queryName);
-  document.getElementById("queryName").value = "";
-  document.getElementById("url").value = "";
-  document.getElementById("apiKey").value = "";
-  document.getElementById("query").value = "";
-
-  loadQueryList();
+  try {
+    setAlertMsg("Deleting query...");
+    const queryName = document.getElementById("queryList").value;
+    deleteQuery(queryName);
+    document.getElementById("queryName").value = "";
+    document.getElementById("url").value = "";
+    document.getElementById("apiKey").value = "";
+    document.getElementById("query").value = "";
+    setAlertMsg("Query deleted from your list");
+    loadQueryList();
+  } catch (error) {
+    setAlertMsg(`Error: ${error.message}`);
+    console.error(error);
+    console.error("Error code: " + error.code);
+    console.error("Error message: " + error.message);
+    console.error("Error debugInfo: " + error.debugInfo);
+  }
 }
 
 export async function loadQueryList() {
@@ -170,4 +194,9 @@ export async function loadSelectedQuery() {
   document.getElementById("url").value = query.url;
   document.getElementById("apiKey").value = query.apiKey;
   document.getElementById("query").value = query.query;
+  setAlertMsg("Query loaded");
+}
+
+export async function clearAlertMsg() {
+  setAlertMsg("");
 }
