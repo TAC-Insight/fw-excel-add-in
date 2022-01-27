@@ -7,7 +7,7 @@
   <Version>1.0.0.1</Version>
   <ProviderName>TAC Insight</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Fast-Weigh Add-in"/>
+  <DisplayName DefaultValue="Fast-Weigh for Excel"/>
   <Description DefaultValue="Fast-Weigh + Excel = :)"/>
   <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png"/>
